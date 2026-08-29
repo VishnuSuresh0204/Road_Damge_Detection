@@ -9,6 +9,7 @@ from django.utils import timezone
 
 from .models import *
 
+
 # -------------------------------------------------
 # LOGIN CHECK
 # -------------------------------------------------
@@ -300,7 +301,6 @@ def admin_view_reports(request):
 
 
 
-
 def admin_verify_report(request):
 
     check = require_admin(request)
@@ -345,3 +345,78 @@ def admin_reject_report(request):
     return redirect("/admin_view_reports")
 
 
+def admin_assign_repair(request):
+
+    check = require_admin(request)
+    if check:
+        return check
+
+    pk = request.GET.get("id")
+
+    try:
+        report = RoadDamage.objects.get(pk=pk)
+    except RoadDamage.DoesNotExist:
+        messages.error(request, "That report doesn't exist")
+        return redirect("/admin_view_reports")
+
+    if request.method == "POST":
+
+        assigned_to = request.POST.get("assigned_to")
+        repair_description = request.POST.get("repair_description")
+
+        if not assigned_to:
+            messages.error(request, "Please specify who the repair is assigned to")
+            return render(request, "ADMIN/assign_repair.html", {"report": report})
+
+        Repair.objects.create(
+            damage=report,
+            assigned_to=assigned_to,
+            repair_description=repair_description,
+            status="Assigned"
+        )
+
+        report.status = "Assigned"
+        report.save()
+
+        messages.success(request, f"Repair assigned for report #{report.pk}")
+
+        return redirect("/admin_view_reports")
+
+    return render(request, "ADMIN/assign_repair.html", {"report": report})
+
+
+def admin_update_repair(request):
+
+    check = require_admin(request)
+    if check:
+        return check
+
+    pk = request.GET.get("id")
+
+    try:
+        repair = Repair.objects.get(pk=pk)
+    except Repair.DoesNotExist:
+        messages.error(request, "That repair record doesn't exist")
+        return redirect("/admin_view_reports")
+
+    if request.method == "POST":
+
+        status = request.POST.get("status", repair.status)
+        repair_description = request.POST.get("repair_description", repair.repair_description)
+
+        repair.status = status
+        repair.repair_description = repair_description
+
+        if status == "Completed" and not repair.completed_date:
+            repair.completed_date = timezone.now()
+
+        repair.save()
+
+        repair.damage.status = repair.status
+        repair.damage.save()
+
+        messages.success(request, f"Repair #{repair.pk} updated")
+
+        return redirect("/admin_view_reports")
+
+    return render(request, "ADMIN/update_repair.html", {"repair": repair})
