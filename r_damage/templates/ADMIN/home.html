@@ -8,323 +8,550 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Admin Dashboard - RoadAI</title>
+    <title>Admin Dashboard - RoadGuard</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           rel="stylesheet">
 
-    <style>
-
-        body {
-            background: #f5f7fa;
-        }
-
-        .sidebar {
-            min-height: 100vh;
-            background: #212529;
-        }
-
-        .sidebar a {
-            color: #ddd;
-            text-decoration: none;
-            display: block;
-            padding: 12px 20px;
-        }
-
-        .sidebar a:hover {
-            background: #343a40;
-            color: white;
-        }
-
-        .stat-card {
-            border: none;
-            border-radius: 15px;
-        }
-
-    </style>
-
 </head>
 
-<body>
+
+<body class="bg-light">
 
 
-<div class="container-fluid">
+<nav class="navbar navbar-dark bg-dark">
 
-    <div class="row">
+    <div class="container">
 
+        <a class="navbar-brand fw-bold"
+           href="/admin_home">
 
-        <!-- SIDEBAR -->
+            RoadGuard Admin
 
-        <div class="col-md-2 sidebar p-0">
-
-            <div class="p-4">
-
-                <h3 class="text-white">
-                    RoadAI
-                </h3>
-
-                <p class="text-secondary">
-                    Administrator
-                </p>
-
-                <hr class="text-secondary">
-
-            </div>
+        </a>
 
 
-            <a href="/admin_home">
-                🏠 Dashboard
+        <div>
+
+            <a href="/admin_home"
+               class="btn btn-outline-light me-2">
+
+                Dashboard
+
             </a>
 
-            <a href="/admin-users">
-                👥 Users
+            <a href="/admin_view_reports"
+               class="btn btn-light me-2">
+
+                Reports
+
             </a>
 
-            <a href="/admin-reports">
-                📋 Damage Reports
-            </a>
+            <a href="/signout"
+               class="btn btn-danger">
 
-            <a href="/admin-repairs">
-                🔧 Repairs
-            </a>
+                Logout
 
-            <a href="/admin-analytics">
-                📊 Analytics
-            </a>
-
-            <a href="/logout">
-                🚪 Logout
             </a>
 
         </div>
 
+    </div>
 
-        <!-- MAIN CONTENT -->
-
-        <div class="col-md-10 p-4">
+</nav>
 
 
-            <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="container py-5">
 
-                <div>
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+
+    <div class="mb-4">
+
+        <h2 class="fw-bold">
+            Admin Dashboard
+        </h2>
+
+        <p class="text-muted">
+            Road damage reporting and monitoring overview.
+        </p>
+
+    </div>
+
+
+    <!-- Main Statistics -->
+
+    <div class="row g-4 mb-4">
+
+
+        <div class="col-md-6">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+                        Total Users
+                    </h6>
 
                     <h2 class="fw-bold">
-                        Admin Dashboard
+                        {{ total_users }}
                     </h2>
 
-                    <p class="text-muted">
-                        Road damage monitoring and management
-                    </p>
-
                 </div>
-
-
-                <a href="/logout"
-                   class="btn btn-outline-danger">
-
-                    Logout
-
-                </a>
 
             </div>
 
-
-            <!-- STATISTICS -->
-
-            <div class="row g-4">
+        </div>
 
 
-                <div class="col-md-3">
+        <div class="col-md-6">
 
-                    <div class="card stat-card shadow-sm p-4">
+            <div class="card shadow-sm border-0">
 
-                        <h6 class="text-muted">
-                            Total Reports
-                        </h6>
+                <div class="card-body">
 
-                        <h2 class="fw-bold">
-                            0
-                        </h2>
+                    <h6 class="text-muted">
+                        Total Reports
+                    </h6>
 
-                    </div>
-
-                </div>
-
-
-                <div class="col-md-3">
-
-                    <div class="card stat-card shadow-sm p-4">
-
-                        <h6 class="text-muted">
-                            Potholes
-                        </h6>
-
-                        <h2 class="fw-bold text-danger">
-                            0
-                        </h2>
-
-                    </div>
-
-                </div>
-
-
-                <div class="col-md-3">
-
-                    <div class="card stat-card shadow-sm p-4">
-
-                        <h6 class="text-muted">
-                            Cracks
-                        </h6>
-
-                        <h2 class="fw-bold">
-                            0
-                        </h2>
-
-                    </div>
-
-                </div>
-
-
-                <div class="col-md-3">
-
-                    <div class="card stat-card shadow-sm p-4">
-
-                        <h6 class="text-muted">
-                            Pending
-                        </h6>
-
-                        <h2 class="fw-bold">
-                            0
-                        </h2>
-
-                    </div>
-
-                </div>
-
-
-            </div>
-
-
-            <!-- QUICK ACTIONS -->
-
-            <div class="card shadow-sm border-0 p-4 mt-4">
-
-                <h4 class="mb-4">
-                    Quick Actions
-                </h4>
-
-
-                <div class="row g-3">
-
-
-                    <div class="col-md-4">
-
-                        <a href="/admin-reports"
-                           class="btn btn-outline-danger w-100 p-3">
-
-                            📋 View Damage Reports
-
-                        </a>
-
-                    </div>
-
-
-                    <div class="col-md-4">
-
-                        <a href="/admin-repairs"
-                           class="btn btn-outline-dark w-100 p-3">
-
-                            🔧 Manage Repairs
-
-                        </a>
-
-                    </div>
-
-
-                    <div class="col-md-4">
-
-                        <a href="/admin-analytics"
-                           class="btn btn-outline-primary w-100 p-3">
-
-                            📊 View Analytics
-
-                        </a>
-
-                    </div>
-
+                    <h2 class="fw-bold">
+                        {{ total_reports }}
+                    </h2>
 
                 </div>
 
             </div>
 
+        </div>
 
-            <!-- AI INFORMATION -->
 
-            <div class="card shadow-sm border-0 p-4 mt-4">
+    </div>
 
-                <h4>
-                    🤖 AI Detection System
-                </h4>
+
+    <!-- Status -->
+
+    <h5 class="fw-bold mb-3">
+        Report Status
+    </h5>
+
+
+    <div class="row g-4 mb-5">
+
+
+        <div class="col-md-4">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body">
+
+                    <h6>Reported</h6>
+
+                    <h3>
+                        {{ reported }}
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body">
+
+                    <h6>Verified</h6>
+
+                    <h3 class="text-primary">
+                        {{ verified }}
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body">
+
+                    <h6>Assigned</h6>
+
+                    <h3>
+                        {{ assigned }}
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body">
+
+                    <h6>Under Repair</h6>
+
+                    <h3 class="text-warning">
+                        {{ under_repair }}
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body">
+
+                    <h6>Completed</h6>
+
+                    <h3 class="text-success">
+                        {{ completed }}
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body">
+
+                    <h6>Rejected</h6>
+
+                    <h3 class="text-danger">
+                        {{ rejected }}
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- Severity -->
+
+    <h5 class="fw-bold mb-3">
+        Severity Overview
+    </h5>
+
+
+    <div class="row g-4 mb-5">
+
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <h6>High Severity</h6>
+
+                    <h3 class="text-danger">
+                        {{ high_severity }}
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <h6>Medium Severity</h6>
+
+                    <h3 class="text-warning">
+                        {{ medium_severity }}
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <h6>Low Severity</h6>
+
+                    <h3 class="text-success">
+                        {{ low_severity }}
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- Damage Type -->
+
+    <div class="card shadow-sm border-0 mb-5">
+
+        <div class="card-header bg-dark text-white">
+
+            <h5 class="mb-0">
+                Damage Type Statistics
+            </h5>
+
+        </div>
+
+
+        <div class="card-body">
+
+
+            {% if by_type %}
+
+                <div class="table-responsive">
+
+                    <table class="table table-bordered">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Damage Type
+                                </th>
+
+                                <th>
+                                    Number of Reports
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+
+                        {% for item in by_type %}
+
+                            <tr>
+
+                                <td>
+                                    {{ item.damage_type|default:"Unknown" }}
+                                </td>
+
+                                <td>
+                                    {{ item.count }}
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
 
                 <p class="text-muted">
-
-                    The AI model analyzes uploaded road images
-                    and detects potholes, cracks and other
-                    road damage.
-
+                    No damage type data available.
                 </p>
 
-
-                <div class="row text-center">
-
-
-                    <div class="col-md-4">
-
-                        <h5>
-                            Pothole Detection
-                        </h5>
-
-                        <span class="badge bg-danger">
-                            Active
-                        </span>
-
-                    </div>
-
-
-                    <div class="col-md-4">
-
-                        <h5>
-                            Crack Detection
-                        </h5>
-
-                        <span class="badge bg-danger">
-                            Active
-                        </span>
-
-                    </div>
-
-
-                    <div class="col-md-4">
-
-                        <h5>
-                            Severity Analysis
-                        </h5>
-
-                        <span class="badge bg-warning text-dark">
-                            Active
-                        </span>
-
-                    </div>
-
-
-                </div>
-
-            </div>
+            {% endif %}
 
 
         </div>
 
     </div>
+
+
+    <!-- Recent Reports -->
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-dark text-white">
+
+            <h5 class="mb-0">
+                Recent Reports
+            </h5>
+
+        </div>
+
+
+        <div class="card-body p-0">
+
+
+            {% if recent_reports %}
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover mb-0">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Image</th>
+                                <th>Type</th>
+                                <th>Severity</th>
+                                <th>Status</th>
+                                <th>Action</th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+
+                        {% for report in recent_reports %}
+
+                            <tr>
+
+                                <td>
+                                    #{{ report.id }}
+                                </td>
+
+
+                                <td>
+                                    {{ report.user.username }}
+                                </td>
+
+
+                                <td>
+
+                                    {% if report.image %}
+
+                                        <img src="{{ report.image.url }}"
+                                             width="70"
+                                             height="50"
+                                             class="rounded"
+                                             style="object-fit:cover;">
+
+                                    {% else %}
+
+                                        No image
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <td>
+                                    {{ report.damage_type|default:"Pending" }}
+                                </td>
+
+
+                                <td>
+                                    {{ report.severity|default:"Pending" }}
+                                </td>
+
+
+                                <td>
+
+                                    <span class="badge bg-secondary">
+
+                                        {{ report.status|default:"Reported" }}
+
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    <a href="/report_detail/{{ report.id }}"
+                                       class="btn btn-sm btn-dark">
+
+                                        View
+
+                                    </a>
+
+                                </td>
+
+
+                            </tr>
+
+                        {% endfor %}
+
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <div class="p-4 text-center">
+
+                    <p class="text-muted mb-0">
+                        No reports available.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+
+        </div>
+
+    </div>
+
 
 </div>
 
