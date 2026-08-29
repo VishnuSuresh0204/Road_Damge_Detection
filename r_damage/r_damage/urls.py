@@ -24,4 +24,10 @@ urlpatterns = [
     path('register/', views.register_view),
     path('user_home/', views.user_home),
     path('admin_home/', views.admin_home),
+    path('report_damage/', views.report_damage),
+    path('report_details/<int:pk>/', views.report_detail),
+    path('my_reports/', views.my_reports),
+    path('admin_view_reports/', views.admin_view_reports),
+    path('admin_verify_report/<int:pk>/', views.admin_verify_report),
+    path('admin_reject_report/<int:pk>/', views.admin_reject_report),
 ]
