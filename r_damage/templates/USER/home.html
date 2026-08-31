@@ -1,437 +1,172 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base_entity.html" %}
 
-<head>
+{% block title %}User Dashboard{% endblock %}
+{% block role_label %}User{% endblock %}
 
-    <meta charset="UTF-8">
+{% block brand_url %}/dashboard{% endblock %}
+{% block brand_name %}RoadAI{% endblock %}
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+{% block nav_links %}
+<a href="/dashboard"     class="nav-pill nav-pill-ghost active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+<a href="/my_reports"    class="nav-pill nav-pill-ghost"><i class="fas fa-list-alt"></i> My Reports</a>
+<a href="/report_damage" class="nav-pill" style="background:var(--neon-orange);color:#fff;border:1px solid var(--neon-orange);">
+    <i class="fas fa-plus"></i> Report Damage
+</a>
+{% endblock %}
 
-    <title>User Dashboard - RoadGuard</title>
+{% block content %}
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-
-</head>
-
-
-<body class="bg-light">
-
-
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-
-    <div class="container">
-
-        <a class="navbar-brand fw-bold"
-           href="/dashboard">
-
-            RoadGuard
-
-        </a>
-
-
-        <div class="d-flex">
-
-            <a href="/dashboard"
-               class="btn btn-outline-light me-2">
-
-                Dashboard
-
-            </a>
-
-            <a href="/my_reports"
-               class="btn btn-outline-light me-2">
-
-                My Reports
-
-            </a>
-
-            <a href="/report_damage"
-               class="btn btn-light me-2">
-
-                Report Damage
-
-            </a>
-
-            <a href="/signout"
-               class="btn btn-danger">
-
-                Logout
-
-            </a>
-
-        </div>
-
+<!-- Page Header -->
+<div class="d-flex align-items-center justify-content-between mb-4 fade-in">
+    <div>
+        <div class="page-title"><i class="fas fa-tachometer-alt" style="color:var(--neon-cyan);font-size:1.2rem;"></i> User Dashboard</div>
+        <div class="page-subtitle">Monitor and manage your road damage reports</div>
     </div>
-
-</nav>
-
-
-<div class="container py-5">
-
-
-    {% if messages %}
-
-        {% for message in messages %}
-
-            <div class="alert alert-{{ message.tags }}">
-                {{ message }}
-            </div>
-
-        {% endfor %}
-
-    {% endif %}
-
-
-    <div class="mb-4">
-
-        <h2 class="fw-bold">
-            User Dashboard
-        </h2>
-
-        <p class="text-muted">
-            Monitor your road damage reports.
-        </p>
-
-    </div>
-
-
-    <!-- Total Reports -->
-
-    <div class="row g-4 mb-4">
-
-        <div class="col-md-4">
-
-            <div class="card shadow-sm border-0">
-
-                <div class="card-body">
-
-                    <h6 class="text-muted">
-                        Total Reports
-                    </h6>
-
-                    <h2 class="fw-bold">
-                        {{ total_reports }}
-                    </h2>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="col-md-4">
-
-            <div class="card shadow-sm border-0">
-
-                <div class="card-body">
-
-                    <h6 class="text-muted">
-                        Completed
-                    </h6>
-
-                    <h2 class="fw-bold text-success">
-                        {{ completed }}
-                    </h2>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="col-md-4">
-
-            <div class="card shadow-sm border-0">
-
-                <div class="card-body">
-
-                    <h6 class="text-muted">
-                        Pending
-                    </h6>
-
-                    <h2 class="fw-bold text-warning">
-                        {{ pending }}
-                    </h2>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- Damage Types -->
-
-    <h5 class="fw-bold mb-3">
-        Damage Types
-    </h5>
-
-
-    <div class="row g-4 mb-4">
-
-
-        <div class="col-md-4">
-
-            <div class="card shadow-sm border-0">
-
-                <div class="card-body">
-
-                    <h6>Potholes</h6>
-
-                    <h3>
-                        {{ potholes }}
-                    </h3>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="col-md-4">
-
-            <div class="card shadow-sm border-0">
-
-                <div class="card-body">
-
-                    <h6>Cracks</h6>
-
-                    <h3>
-                        {{ cracks }}
-                    </h3>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="col-md-4">
-
-            <div class="card shadow-sm border-0">
-
-                <div class="card-body">
-
-                    <h6>Surface Damage</h6>
-
-                    <h3>
-                        {{ surface_damage }}
-                    </h3>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- Severity -->
-
-    <h5 class="fw-bold mb-3">
-        Severity
-    </h5>
-
-
-    <div class="row g-4 mb-5">
-
-
-        <div class="col-md-4">
-
-            <div class="card shadow-sm border-0">
-
-                <div class="card-body">
-
-                    <h6>High</h6>
-
-                    <h3 class="text-danger">
-                        {{ high_severity }}
-                    </h3>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="col-md-4">
-
-            <div class="card shadow-sm border-0">
-
-                <div class="card-body">
-
-                    <h6>Medium</h6>
-
-                    <h3 class="text-warning">
-                        {{ medium_severity }}
-                    </h3>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="col-md-4">
-
-            <div class="card shadow-sm border-0">
-
-                <div class="card-body">
-
-                    <h6>Low</h6>
-
-                    <h3 class="text-success">
-                        {{ low_severity }}
-                    </h3>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- Recent Reports -->
-
-    <div class="card shadow-sm border-0">
-
-        <div class="card-header bg-dark text-white">
-
-            <h5 class="mb-0">
-                Recent Reports
-            </h5>
-
-        </div>
-
-
-        <div class="card-body p-0">
-
-            {% if recent_reports %}
-
-            <div class="table-responsive">
-
-                <table class="table table-hover mb-0">
-
-                    <thead>
-
-                        <tr>
-
-                            <th>ID</th>
-                            <th>Image</th>
-                            <th>Type</th>
-                            <th>Severity</th>
-                            <th>Status</th>
-                            <th>Action</th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody>
-
-                    {% for report in recent_reports %}
-
-                        <tr>
-
-                            <td>
-                                #{{ report.id }}
-                            </td>
-
-
-                            <td>
-
-                                {% if report.image %}
-
-                                    <img src="{{ report.image.url }}"
-                                         width="70"
-                                         height="50"
-                                         style="object-fit:cover;"
-                                         class="rounded">
-
-                                {% else %}
-
-                                    No Image
-
-                                {% endif %}
-
-                            </td>
-
-
-                            <td>
-                                {{ report.damage_type|default:"Not detected" }}
-                            </td>
-
-
-                            <td>
-                                {{ report.severity|default:"Not detected" }}
-                            </td>
-
-
-                            <td>
-
-                                <span class="badge bg-secondary">
-
-                                    {{ report.status|default:"Reported" }}
-
-                                </span>
-
-                            </td>
-
-
-                            <td>
-
-                                <a href="/report_detail/{{ report.id }}"
-                                   class="btn btn-sm btn-dark">
-
-                                    View
-
-                                </a>
-
-                            </td>
-
-                        </tr>
-
-                    {% endfor %}
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-            {% else %}
-
-                <div class="p-4 text-center">
-
-                    <p class="text-muted mb-0">
-                        No reports found.
-                    </p>
-
-                </div>
-
-            {% endif %}
-
-        </div>
-
-    </div>
-
-
+    <a href="/report_damage" class="btn-cyber btn-cyber-primary">
+        <i class="fas fa-camera"></i> New Report
+    </a>
 </div>
 
+<!-- Overview Stats -->
+<div class="section-heading"><i class="fas fa-chart-bar"></i> Overview</div>
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card" style="--accent-color:var(--neon-cyan)">
+            <div class="stat-label">Total Reports</div>
+            <div class="stat-value" style="color:var(--neon-cyan)">{{ total_reports }}</div>
+            <i class="fas fa-file-alt stat-icon" style="color:var(--neon-cyan)"></i>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card" style="--accent-color:var(--neon-green)">
+            <div class="stat-label">Completed</div>
+            <div class="stat-value" style="color:var(--neon-green)">{{ completed }}</div>
+            <i class="fas fa-check-circle stat-icon" style="color:var(--neon-green)"></i>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card" style="--accent-color:var(--neon-orange)">
+            <div class="stat-label">Pending</div>
+            <div class="stat-value" style="color:var(--neon-orange)">{{ pending }}</div>
+            <i class="fas fa-clock stat-icon" style="color:var(--neon-orange)"></i>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card" style="--accent-color:#ffb74d">
+            <div class="stat-label">Under Repair</div>
+            <div class="stat-value" style="color:#ffb74d">{{ under_repair }}</div>
+            <i class="fas fa-wrench stat-icon" style="color:#ffb74d"></i>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card" style="--accent-color:#82b1ff">
+            <div class="stat-label">Potholes</div>
+            <div class="stat-value" style="color:#82b1ff">{{ potholes }}</div>
+            <i class="fas fa-circle stat-icon" style="color:#82b1ff"></i>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card" style="--accent-color:#ce93d8">
+            <div class="stat-label">Cracks</div>
+            <div class="stat-value" style="color:#ce93d8">{{ cracks }}</div>
+            <i class="fas fa-bolt stat-icon" style="color:#ce93d8"></i>
+        </div>
+    </div>
+</div>
 
-</body>
-</html>
+<!-- Severity Row -->
+<div class="section-heading"><i class="fas fa-exclamation-triangle"></i> Severity</div>
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card" style="--accent-color:var(--neon-red)">
+            <div class="stat-label">High Severity</div>
+            <div class="stat-value" style="color:var(--neon-red)">{{ high_severity }}</div>
+            <i class="fas fa-arrow-up stat-icon" style="color:var(--neon-red)"></i>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card" style="--accent-color:var(--neon-orange)">
+            <div class="stat-label">Medium Severity</div>
+            <div class="stat-value" style="color:var(--neon-orange)">{{ medium_severity }}</div>
+            <i class="fas fa-minus stat-icon" style="color:var(--neon-orange)"></i>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card" style="--accent-color:var(--neon-green)">
+            <div class="stat-label">Low Severity</div>
+            <div class="stat-value" style="color:var(--neon-green)">{{ low_severity }}</div>
+            <i class="fas fa-arrow-down stat-icon" style="color:var(--neon-green)"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Reports -->
+<div class="section-heading"><i class="fas fa-history"></i> Recent Reports</div>
+<div class="glass-card">
+    <div class="glass-card-header">
+        <i class="fas fa-table" style="color:var(--neon-cyan)"></i>
+        <h5>Latest 5 Reports</h5>
+        <div class="ms-auto">
+            <a href="/my_reports" class="btn-cyber btn-cyber-cyan btn-cyber-sm">View All</a>
+        </div>
+    </div>
+    <div class="glass-card-body p-0">
+        {% if recent_reports %}
+        <div class="table-responsive">
+            <table class="table-cyber">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Image</th>
+                        <th>Type</th>
+                        <th>Severity</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for report in recent_reports %}
+                <tr>
+                    <td><span style="color:var(--neon-cyan);font-family:var(--font-heading);font-size:0.82rem;">#{{ report.id }}</span></td>
+                    <td>
+                        {% if report.image %}
+                        <img src="{{ report.image.url }}" class="report-thumb">
+                        {% else %}
+                        <span style="color:var(--text-muted);font-size:0.8rem;">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ report.damage_type|default:"Pending"|capfirst }}</td>
+                    <td>
+                        {% if report.severity == "High" %}<span class="badge-cyber badge-high">High</span>
+                        {% elif report.severity == "Medium" %}<span class="badge-cyber badge-medium">Medium</span>
+                        {% elif report.severity == "Low" %}<span class="badge-cyber badge-low">Low</span>
+                        {% else %}<span class="badge-cyber badge-reported">—</span>{% endif %}
+                    </td>
+                    <td>
+                        {% if report.status == "Completed" %}<span class="badge-cyber badge-completed">Completed</span>
+                        {% elif report.status == "Under Repair" %}<span class="badge-cyber badge-repair">Under Repair</span>
+                        {% elif report.status == "Verified" %}<span class="badge-cyber badge-verified">Verified</span>
+                        {% elif report.status == "Assigned" %}<span class="badge-cyber badge-assigned">Assigned</span>
+                        {% elif report.status == "Rejected" %}<span class="badge-cyber badge-rejected">Rejected</span>
+                        {% else %}<span class="badge-cyber badge-reported">{{ report.status|default:"Reported" }}</span>{% endif %}
+                    </td>
+                    <td>
+                        <a href="/report_detail/{{ report.id }}" class="btn-cyber btn-cyber-cyan btn-cyber-sm">
+                            <i class="fas fa-eye"></i> View
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5" style="color:var(--text-muted);">
+            <i class="fas fa-folder-open" style="font-size:2.5rem;color:rgba(0,229,255,0.2);margin-bottom:1rem;display:block;"></i>
+            <p>No reports yet. <a href="/report_damage" style="color:var(--neon-cyan);">Submit your first report</a>.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
