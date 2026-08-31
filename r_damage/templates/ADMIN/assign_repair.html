@@ -1,0 +1,111 @@
+{% extends "base_entity.html" %}
+
+{% block title %}Assign Repair{% endblock %}
+{% block role_label %}Admin{% endblock %}
+
+{% block brand_url %}/admin_home{% endblock %}
+{% block brand_name %}RoadAI Admin{% endblock %}
+
+{% block nav_links %}
+<a href="/admin_home"         class="nav-pill nav-pill-ghost"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+<a href="/admin_view_reports" class="nav-pill nav-pill-ghost"><i class="fas fa-file-alt"></i> Reports</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex align-items-center gap-3 mb-4 fade-in">
+    <a href="/admin_view_reports" class="btn-cyber btn-cyber-ghost btn-cyber-sm">
+        <i class="fas fa-arrow-left"></i> Back
+    </a>
+    <div>
+        <div class="page-title"><i class="fas fa-hard-hat" style="color:var(--neon-orange);font-size:1.1rem;"></i> Assign Repair</div>
+        <div class="page-subtitle">Report #{{ report.id }} — {{ report.damage_type|default:"Unknown"|capfirst }}</div>
+    </div>
+</div>
+
+<div class="row g-4 fade-in justify-content-center">
+
+    <!-- Report Summary -->
+    <div class="col-lg-5">
+        <div class="glass-card">
+            <div class="glass-card-header">
+                <i class="fas fa-file-alt" style="color:var(--neon-cyan)"></i>
+                <h5>Report Summary</h5>
+            </div>
+            <div class="glass-card-body">
+                {% if report.image %}
+                <img src="{{ report.image.url }}" class="img-fluid mb-3"
+                     style="border-radius:8px;border:1px solid rgba(0,229,255,0.15);max-height:200px;width:100%;object-fit:cover;">
+                {% endif %}
+
+                <div style="display:flex;flex-direction:column;gap:0.8rem;">
+                    <div>
+                        <div style="font-size:0.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--neon-cyan);">Damage Type</div>
+                        <div style="color:var(--neon-orange);font-weight:600;">{{ report.damage_type|default:"N/A"|capfirst }}</div>
+                    </div>
+                    <div>
+                        <div style="font-size:0.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--neon-cyan);">Severity</div>
+                        {% if report.severity == "High" %}<span class="badge-cyber badge-high">High</span>
+                        {% elif report.severity == "Medium" %}<span class="badge-cyber badge-medium">Medium</span>
+                        {% elif report.severity == "Low" %}<span class="badge-cyber badge-low">Low</span>
+                        {% else %}<span style="color:var(--text-muted);">N/A</span>{% endif %}
+                    </div>
+                    <div>
+                        <div style="font-size:0.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--neon-cyan);">Location</div>
+                        <div style="color:var(--text-primary);">{{ report.location_name|default:"Not provided" }}</div>
+                    </div>
+                    <div>
+                        <div style="font-size:0.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--neon-cyan);">Status</div>
+                        <span class="badge-cyber badge-verified">Verified</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assign Form -->
+    <div class="col-lg-7">
+        <div class="glass-card">
+            <div class="glass-card-header">
+                <i class="fas fa-hard-hat" style="color:var(--neon-orange)"></i>
+                <h5 style="color:var(--neon-orange);">Assign Repair Team</h5>
+            </div>
+            <div class="glass-card-body">
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label-futuristic">Assigned To *</label>
+                        <div style="position:relative;">
+                            <i class="fas fa-user-hard-hat" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:rgba(0,229,255,0.4);"></i>
+                            <input type="text" name="assigned_to"
+                                   class="form-control-futuristic"
+                                   style="padding-left:2.4rem;"
+                                   placeholder="Repair team or technician name"
+                                   required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label-futuristic">Repair Instructions</label>
+                        <textarea name="repair_description"
+                                  class="form-control-futuristic"
+                                  rows="5"
+                                  placeholder="Describe the repair work to be done…"></textarea>
+                    </div>
+
+                    <div class="d-flex gap-3">
+                        <a href="/admin_view_reports" class="btn-cyber btn-cyber-ghost">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn-cyber btn-cyber-primary">
+                            <i class="fas fa-paper-plane"></i> Assign Repair
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
