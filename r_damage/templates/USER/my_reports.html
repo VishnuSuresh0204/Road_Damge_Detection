@@ -1,312 +1,102 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base_entity.html" %}
 
-<head>
+{% block title %}My Reports{% endblock %}
+{% block role_label %}User{% endblock %}
 
-    <meta charset="UTF-8">
+{% block brand_url %}/dashboard{% endblock %}
+{% block brand_name %}RoadAI{% endblock %}
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+{% block nav_links %}
+<a href="/dashboard"     class="nav-pill nav-pill-ghost"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+<a href="/my_reports"    class="nav-pill nav-pill-ghost active"><i class="fas fa-list-alt"></i> My Reports</a>
+<a href="/report_damage" class="nav-pill" style="background:var(--neon-orange);color:#fff;border:1px solid var(--neon-orange);">
+    <i class="fas fa-plus"></i> Report Damage
+</a>
+{% endblock %}
 
-    <title>My Reports - RoadGuard</title>
+{% block content %}
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-
-</head>
-
-
-<body class="bg-light">
-
-
-<nav class="navbar navbar-dark bg-dark">
-
-    <div class="container">
-
-        <a class="navbar-brand fw-bold"
-           href="/dashboard">
-
-            RoadGuard
-
-        </a>
-
-
-        <div>
-
-            <a href="/dashboard"
-               class="btn btn-outline-light me-2">
-
-                Dashboard
-
-            </a>
-
-            <a href="/report_damage"
-               class="btn btn-light me-2">
-
-                Report Damage
-
-            </a>
-
-            <a href="/signout"
-               class="btn btn-danger">
-
-                Logout
-
-            </a>
-
-        </div>
-
+<div class="d-flex align-items-center justify-content-between mb-4 fade-in">
+    <div>
+        <div class="page-title"><i class="fas fa-list-alt" style="color:var(--neon-cyan);font-size:1.2rem;"></i> My Reports</div>
+        <div class="page-subtitle">All road damage reports you have submitted</div>
     </div>
-
-</nav>
-
-
-<div class="container py-5">
-
-
-    {% if messages %}
-
-        {% for message in messages %}
-
-            <div class="alert alert-{{ message.tags }}">
-                {{ message }}
-            </div>
-
-        {% endfor %}
-
-    {% endif %}
-
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
-
-        <div>
-
-            <h2 class="fw-bold">
-                My Reports
-            </h2>
-
-            <p class="text-muted mb-0">
-                View all your submitted road damage reports.
-            </p>
-
-        </div>
-
-
-        <a href="/report_damage"
-           class="btn btn-dark">
-
-            + Report Damage
-
-        </a>
-
-    </div>
-
-
-    <div class="card shadow-sm border-0">
-
-
-        <div class="card-body p-0">
-
-
-            {% if val %}
-
-                <div class="table-responsive">
-
-                    <table class="table table-hover align-middle mb-0">
-
-
-                        <thead class="table-dark">
-
-                            <tr>
-
-                                <th>ID</th>
-
-                                <th>Image</th>
-
-                                <th>Location</th>
-
-                                <th>Damage Type</th>
-
-                                <th>Severity</th>
-
-                                <th>Status</th>
-
-                                <th>Action</th>
-
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody>
-
-
-                        {% for report in val %}
-
-                            <tr>
-
-
-                                <td>
-                                    #{{ report.id }}
-                                </td>
-
-
-                                <td>
-
-                                    {% if report.image %}
-
-                                        <img src="{{ report.image.url }}"
-                                             width="80"
-                                             height="55"
-                                             class="rounded"
-                                             style="object-fit:cover;">
-
-                                    {% else %}
-
-                                        No image
-
-                                    {% endif %}
-
-                                </td>
-
-
-                                <td>
-
-                                    {{ report.location_name|default:"Not provided" }}
-
-                                </td>
-
-
-                                <td>
-
-                                    {{ report.damage_type|default:"Pending" }}
-
-                                </td>
-
-
-                                <td>
-
-                                    {% if report.severity == "High" %}
-
-                                        <span class="badge bg-danger">
-                                            High
-                                        </span>
-
-                                    {% elif report.severity == "Medium" %}
-
-                                        <span class="badge bg-warning text-dark">
-                                            Medium
-                                        </span>
-
-                                    {% elif report.severity == "Low" %}
-
-                                        <span class="badge bg-success">
-                                            Low
-                                        </span>
-
-                                    {% else %}
-
-                                        <span class="badge bg-secondary">
-                                            Pending
-                                        </span>
-
-                                    {% endif %}
-
-                                </td>
-
-
-                                <td>
-
-                                    {% if report.status == "Completed" %}
-
-                                        <span class="badge bg-success">
-                                            Completed
-                                        </span>
-
-                                    {% elif report.status == "Under Repair" %}
-
-                                        <span class="badge bg-warning text-dark">
-                                            Under Repair
-                                        </span>
-
-                                    {% elif report.status == "Rejected" %}
-
-                                        <span class="badge bg-danger">
-                                            Rejected
-                                        </span>
-
-                                    {% elif report.status == "Verified" %}
-
-                                        <span class="badge bg-primary">
-                                            Verified
-                                        </span>
-
-                                    {% else %}
-
-                                        <span class="badge bg-secondary">
-                                            {{ report.status|default:"Reported" }}
-                                        </span>
-
-                                    {% endif %}
-
-                                </td>
-
-
-                                <td>
-
-                                    <a href="/report_detail/{{ report.id }}"
-                                       class="btn btn-sm btn-dark">
-
-                                        View
-
-                                    </a>
-
-                                </td>
-
-
-                            </tr>
-
-                        {% endfor %}
-
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-
-            {% else %}
-
-                <div class="text-center p-5">
-
-                    <h5>
-                        No Reports Found
-                    </h5>
-
-                    <p class="text-muted">
-                        You haven't submitted any road damage reports yet.
-                    </p>
-
-                    <a href="/report_damage"
-                       class="btn btn-dark">
-
-                        Submit Your First Report
-
-                    </a>
-
-                </div>
-
-            {% endif %}
-
-
-        </div>
-
-    </div>
-
-
+    <a href="/report_damage" class="btn-cyber btn-cyber-primary">
+        <i class="fas fa-plus"></i> New Report
+    </a>
 </div>
 
+<div class="glass-card fade-in">
+    <div class="glass-card-header">
+        <i class="fas fa-clipboard-list" style="color:var(--neon-cyan)"></i>
+        <h5>Submitted Reports</h5>
+    </div>
+    <div class="glass-card-body p-0">
+        {% if val %}
+        <div class="table-responsive">
+            <table class="table-cyber">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Image</th>
+                        <th>Location</th>
+                        <th>Damage Type</th>
+                        <th>Severity</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for report in val %}
+                <tr>
+                    <td><span style="color:var(--neon-cyan);font-family:var(--font-heading);font-size:0.82rem;">#{{ report.id }}</span></td>
+                    <td>
+                        {% if report.image %}
+                        <img src="{{ report.image.url }}" class="report-thumb">
+                        {% else %}
+                        <span style="color:var(--text-muted);font-size:0.8rem;">No image</span>
+                        {% endif %}
+                    </td>
+                    <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                        <i class="fas fa-map-marker-alt" style="color:var(--neon-orange);font-size:0.8rem;"></i>
+                        {{ report.location_name|default:"Not provided" }}
+                    </td>
+                    <td>{{ report.damage_type|default:"Pending"|capfirst }}</td>
+                    <td>
+                        {% if report.severity == "High" %}<span class="badge-cyber badge-high">High</span>
+                        {% elif report.severity == "Medium" %}<span class="badge-cyber badge-medium">Medium</span>
+                        {% elif report.severity == "Low" %}<span class="badge-cyber badge-low">Low</span>
+                        {% else %}<span class="badge-cyber badge-reported">Pending</span>{% endif %}
+                    </td>
+                    <td>
+                        {% if report.status == "Completed" %}<span class="badge-cyber badge-completed">Completed</span>
+                        {% elif report.status == "Under Repair" %}<span class="badge-cyber badge-repair">Under Repair</span>
+                        {% elif report.status == "Verified" %}<span class="badge-cyber badge-verified">Verified</span>
+                        {% elif report.status == "Assigned" %}<span class="badge-cyber badge-assigned">Assigned</span>
+                        {% elif report.status == "Rejected" %}<span class="badge-cyber badge-rejected">Rejected</span>
+                        {% else %}<span class="badge-cyber badge-reported">{{ report.status|default:"Reported" }}</span>{% endif %}
+                    </td>
+                    <td>
+                        <a href="/report_detail/{{ report.id }}" class="btn-cyber btn-cyber-cyan btn-cyber-sm">
+                            <i class="fas fa-eye"></i> View
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5" style="color:var(--text-muted);">
+            <i class="fas fa-folder-open" style="font-size:3rem;color:rgba(0,229,255,0.15);display:block;margin-bottom:1.2rem;"></i>
+            <h6 style="font-family:var(--font-heading);letter-spacing:1px;margin-bottom:0.5rem;">No Reports Found</h6>
+            <p style="font-size:0.88rem;">You haven't submitted any road damage reports yet.</p>
+            <a href="/report_damage" class="btn-cyber btn-cyber-primary mt-2">
+                <i class="fas fa-camera"></i> Submit Your First Report
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
 
-</body>
-</html>
+{% endblock %}
