@@ -1,0 +1,16 @@
+names:
+- crack
+- damage
+- pothole
+- pothole_water
+- pothole_water_m
+nc: 5
+roboflow:
+  license: CC BY 4.0
+  project: road-damage-uyvns
+  url: https://universe.roboflow.com/roaddamage-ak8w6/road-damage-uyvns/dataset/3
+  version: 3
+  workspace: roaddamage-ak8w6
+test: ../test/images
+train: ../train/images
+val: ../valid/images
