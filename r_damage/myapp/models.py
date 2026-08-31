@@ -42,12 +42,13 @@ class UserProfile(models.Model):
 class RoadDamage(models.Model):
 
     DAMAGE_TYPES = [
-        ('Pothole', 'Pothole'),
-        ('Crack', 'Crack'),
-        ('Surface Damage', 'Surface Damage'),
-        ('Broken Road', 'Broken Road'),
-        ('No Damage', 'No Damage'),
-    ]
+    ('crack', 'Crack'),
+    ('damage', 'Damage'),
+    ('pothole', 'Pothole'),
+    ('pothole_water', 'Pothole Water'),
+    ('pothole_water_m', 'Pothole Water M'),
+    ('no_damage', 'No Damage'),
+]
 
     SEVERITY = [
         ('Low', 'Low'),
