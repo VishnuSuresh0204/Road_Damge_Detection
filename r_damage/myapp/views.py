@@ -8,6 +8,7 @@ from django.db.models import Count
 from django.utils import timezone
 
 from .models import *
+from .ml.yolo_detector import detect_road_damage
 
 
 # -------------------------------------------------
@@ -160,45 +161,45 @@ def user_home(request):
     return render(request, "USER/home.html", context)
 
 
-def report_damage(request):
+# def report_damage(request):
 
-    check = require_login(request)
-    if check:
-        return check
+#     check = require_login(request)
+#     if check:
+#         return check
 
-    try:
-        user = Login.objects.get(id=request.session["lid"])
-    except Login.DoesNotExist:
-        request.session.flush()
-        return redirect("/login")
+#     try:
+#         user = Login.objects.get(id=request.session["lid"])
+#     except Login.DoesNotExist:
+#         request.session.flush()
+#         return redirect("/login")
 
-    if request.method == "POST":
+#     if request.method == "POST":
 
-        image = request.FILES.get("image")
-        description = request.POST.get("description")
-        location_name = request.POST.get("location_name")
-        latitude = request.POST.get("latitude") or None
-        longitude = request.POST.get("longitude") or None
+#         image = request.FILES.get("image")
+#         description = request.POST.get("description")
+#         location_name = request.POST.get("location_name")
+#         latitude = request.POST.get("latitude") or None
+#         longitude = request.POST.get("longitude") or None
 
-        if not image:
-            messages.error(request, "Please choose an image to upload")
-            return render(request, "USER/report_damage.html")
+#         if not image:
+#             messages.error(request, "Please choose an image to upload")
+#             return render(request, "USER/report_damage.html")
 
-        # Users only upload — no detection runs here. An admin runs
-        # detection separately via admin_run_detection() below.
-        report = RoadDamage.objects.create(
-            user=user,
-            image=image,
-            description=description,
-            location_name=location_name,
-            latitude=latitude,
-            longitude=longitude
-        )
+#         # Users only upload — no detection runs here. An admin runs
+#         # detection separately via admin_run_detection() below.
+#         report = RoadDamage.objects.create(
+#             user=user,
+#             image=image,
+#             description=description,
+#             location_name=location_name,
+#             latitude=latitude,
+#             longitude=longitude
+#         )
 
-        messages.success(request, "Road damage report submitted. It will be reviewed shortly")
-        return redirect(f"/report_detail/{report.pk}")
+#         messages.success(request, "Road damage report submitted. It will be reviewed shortly")
+#         return redirect(f"/report_detail/{report.pk}")
 
-    return render(request, "USER/report_damage.html")
+#     return render(request, "USER/report_damage.html")
 
 
 def report_detail(request, pk):
@@ -420,3 +421,101 @@ def admin_update_repair(request):
         return redirect("/admin_view_reports")
 
     return render(request, "ADMIN/update_repair.html", {"repair": repair})
+
+def report_damage(request):
+
+    check = require_login(request)
+    if check:
+        return check
+
+    try:
+        user = Login.objects.get(id=request.session["lid"])
+    except Login.DoesNotExist:
+        request.session.flush()
+        return redirect("/login")
+
+    if request.method == "POST":
+
+        image = request.FILES.get("image")
+        description = request.POST.get("description")
+        location_name = request.POST.get("location_name")
+        latitude = request.POST.get("latitude") or None
+        longitude = request.POST.get("longitude") or None
+
+        if not image:
+            messages.error(request, "Please choose an image to upload")
+            return render(request, "USER/report_damage.html")
+
+        # First save the uploaded image
+        report = RoadDamage.objects.create(
+            user=user,
+            image=image,
+            description=description,
+            location_name=location_name,
+            latitude=latitude,
+            longitude=longitude
+        )
+
+        try:
+            # Full path of uploaded image
+            image_path = report.image.path
+
+            # Run YOLO detection
+            detections, result_path = detect_road_damage(image_path)
+
+            if detections:
+
+                # Get detection with highest confidence
+                best_detection = max(
+                    detections,
+                    key=lambda x: x["confidence"]
+                )
+
+                report.damage_type = best_detection["damage_type"]
+                report.confidence = best_detection["confidence"] * 100
+
+                # Calculate severity based on confidence
+                confidence = report.confidence
+
+                if confidence >= 80:
+                    report.severity = "High"
+                elif confidence >= 50:
+                    report.severity = "Medium"
+                else:
+                    report.severity = "Low"
+
+            else:
+                report.damage_type = "no_damage"
+                report.confidence = 0
+                report.severity = "Low"
+
+            # Save detected result image
+            relative_result_path = os.path.relpath(
+                result_path,
+                settings.MEDIA_ROOT
+            )
+
+            report.result_image.name = relative_result_path.replace(
+                "\\",
+                "/"
+            )
+
+            report.save()
+
+        except Exception as e:
+
+            print("YOLO Detection Error:", e)
+
+            messages.warning(
+                request,
+                "Report uploaded, but AI detection could not be completed."
+            )
+
+        messages.success(
+            request,
+            "Road damage report submitted and analyzed successfully"
+        )
+
+        return redirect(f"/report_details/{report.pk}/")
+
+    return render(request, "USER/report_damage.html")
