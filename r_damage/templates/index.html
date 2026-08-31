@@ -1,233 +1,340 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends "base_public.html" %}
+{% load static %}
 
-    <title>Road Damage Detection System</title>
+{% block title %}RoadAI — AI-Powered Road Damage Detection{% endblock %}
+{% block meta_description %}Detect and report road damage using AI and computer vision. Upload images and let our deep learning model identify potholes, cracks, and surface damage.{% endblock %}
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
+{% block extra_head %}
+<style>
+    /* Hero */
+    .hero-section {
+        min-height: 88vh;
+        display: flex;
+        align-items: center;
+        padding: 6rem 0 4rem;
+    }
+    .hero-eyebrow {
+        font-size: 0.75rem;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--neon-orange);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 1.2rem;
+    }
+    .hero-eyebrow::before {
+        content: '';
+        display: block;
+        width: 30px;
+        height: 2px;
+        background: var(--neon-orange);
+        border-radius: 2px;
+    }
+    .hero-title {
+        font-family: var(--font-heading);
+        font-size: clamp(2rem, 5vw, 3.6rem);
+        font-weight: 900;
+        line-height: 1.1;
+        color: #fff;
+    }
+    .hero-title .accent { color: var(--neon-cyan); }
+    .hero-desc {
+        font-size: 1.05rem;
+        color: rgba(200,230,240,0.72);
+        line-height: 1.75;
+        max-width: 540px;
+        margin: 1.5rem 0 2.5rem;
+    }
 
-    <style>
-        body {
-            background: #f5f7fa;
-        }
+    /* Detection preview card */
+    .detection-card {
+        background: rgba(2,18,36,0.85);
+        border: 1px solid rgba(0,229,255,0.22);
+        border-radius: 14px;
+        padding: 2rem;
+        backdrop-filter: blur(24px);
+        position: relative;
+        overflow: hidden;
+    }
+    .detection-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--neon-cyan), var(--neon-orange));
+    }
+    .detection-card-title {
+        font-family: var(--font-heading);
+        font-size: 0.85rem;
+        letter-spacing: 2px;
+        color: var(--neon-cyan);
+        margin-bottom: 1.2rem;
+    }
+    .damage-type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    .damage-type-item {
+        text-align: center;
+        padding: 1rem 0.5rem;
+        border: 1px solid rgba(0,229,255,0.12);
+        border-radius: 8px;
+        background: rgba(0,229,255,0.04);
+        transition: all 0.25s;
+    }
+    .damage-type-item:hover {
+        border-color: rgba(0,229,255,0.35);
+        background: rgba(0,229,255,0.08);
+        transform: translateY(-2px);
+    }
+    .damage-type-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .damage-type-label { font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); }
 
-        .hero {
-            min-height: 90vh;
-            display: flex;
-            align-items: center;
-        }
+    /* Scanning animation */
+    @keyframes scan {
+        0% { transform: translateY(-100%); opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { transform: translateY(400%); opacity: 0; }
+    }
+    .scan-line {
+        position: absolute;
+        left: 0; right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+        animation: scan 3s ease-in-out infinite;
+        top: 20%;
+        pointer-events: none;
+    }
 
-        .hero-title {
-            font-size: 52px;
-            font-weight: 700;
-        }
+    /* Features section */
+    .features-section { padding: 5rem 0; }
+    .feature-card {
+        background: rgba(2,18,36,0.75);
+        border: 1px solid rgba(0,229,255,0.12);
+        border-radius: 12px;
+        padding: 2rem;
+        backdrop-filter: blur(16px);
+        height: 100%;
+        transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+        position: relative;
+        overflow: hidden;
+    }
+    .feature-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+        border-color: rgba(0,229,255,0.35);
+    }
+    .feature-card::after {
+        content: '';
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--neon-cyan), var(--neon-orange));
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s;
+    }
+    .feature-card:hover::after { transform: scaleX(1); }
+    .feature-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        margin-bottom: 1.2rem;
+    }
+    .feature-title {
+        font-family: var(--font-heading);
+        font-size: 0.85rem;
+        letter-spacing: 1.5px;
+        color: var(--text-primary);
+        margin-bottom: 0.75rem;
+    }
+    .feature-desc { font-size: 0.88rem; color: var(--text-muted); line-height: 1.65; }
 
-        .hero-text {
-            font-size: 19px;
-            color: #666;
-        }
+    .section-label {
+        font-family: var(--font-heading);
+        font-size: 0.72rem;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--neon-cyan);
+        margin-bottom: 0.5rem;
+    }
+    .section-title {
+        font-family: var(--font-heading);
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
 
-        .feature-card {
-            border: none;
-            border-radius: 15px;
-            transition: 0.3s;
-        }
+{% block content %}
 
-        .feature-card:hover {
-            transform: translateY(-5px);
-        }
-    </style>
-</head>
-
-<body>
-
-<nav class="navbar navbar-expand-lg bg-dark navbar-dark">
+<!-- Hero -->
+<section class="hero-section">
     <div class="container">
+        <div class="row align-items-center g-5">
 
-        <a class="navbar-brand fw-bold" href="/">
-            RoadAI
-        </a>
-
-        <div>
-            <a href="/login" class="btn btn-outline-light me-2">
-                Login
-            </a>
-
-            <a href="/register" class="btn btn-light">
-                Register
-            </a>
-        </div>
-
-    </div>
-</nav>
-
-
-<section class="hero">
-
-    <div class="container">
-
-        <div class="row align-items-center">
-
-            <div class="col-lg-7">
-
-                <span class="badge bg-danger mb-3">
-                    AI Powered Road Monitoring
-                </span>
-
+            <div class="col-lg-6">
+                <div class="hero-eyebrow">AI-Powered Road Monitoring</div>
                 <h1 class="hero-title">
-                    Road Damage Detection
-                    <span class="text-danger">& Reporting</span>
+                    Smart <span class="accent">Road Damage</span><br>
+                    Detection System
                 </h1>
-
-                <p class="hero-text mt-4">
-                    Detect potholes, cracks and other road damages using
-                    Artificial Intelligence and Computer Vision.
-                    Report damaged roads and help improve road safety.
+                <p class="hero-desc">
+                    Detect potholes, cracks, and surface damage using YOLO deep learning.
+                    Report damaged roads and help build safer infrastructure through AI and computer vision.
                 </p>
-
-                <div class="mt-4">
-
-                    <a href="/login"
-                       class="btn btn-danger btn-lg me-2">
-                        Get Started
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="/login" class="btn-cyber btn-cyber-primary">
+                        <i class="fas fa-bolt"></i> Get Started
                     </a>
-
-                    <a href="/register"
-                       class="btn btn-outline-dark btn-lg">
-                        Create Account
+                    <a href="/register" class="btn-cyber btn-cyber-secondary"
+                       style="background:transparent;border:1px solid rgba(0,229,255,0.45);color:var(--neon-cyan);">
+                        <i class="fas fa-user-plus"></i> Create Account
                     </a>
-
                 </div>
 
+                <!-- Stats row -->
+                <div class="d-flex gap-4 mt-4 flex-wrap">
+                    <div>
+                        <div style="font-family:var(--font-heading);font-size:1.5rem;color:var(--neon-cyan);">YOLO</div>
+                        <div style="font-size:0.72rem;letter-spacing:1px;color:var(--text-muted);">AI Engine</div>
+                    </div>
+                    <div style="width:1px;background:rgba(0,229,255,0.2);"></div>
+                    <div>
+                        <div style="font-family:var(--font-heading);font-size:1.5rem;color:var(--neon-orange);">5+</div>
+                        <div style="font-size:0.72rem;letter-spacing:1px;color:var(--text-muted);">Damage Types</div>
+                    </div>
+                    <div style="width:1px;background:rgba(0,229,255,0.2);"></div>
+                    <div>
+                        <div style="font-family:var(--font-heading);font-size:1.5rem;color:var(--neon-green);">Real-Time</div>
+                        <div style="font-size:0.72rem;letter-spacing:1px;color:var(--text-muted);">Detection</div>
+                    </div>
+                </div>
             </div>
 
-
-            <div class="col-lg-5">
-
-                <div class="card shadow border-0 p-4">
-
-                    <h3 class="fw-bold">
-                        AI Detection
-                    </h3>
-
-                    <p class="text-muted">
-                        Upload a road image and let the system
-                        identify possible damage.
-                    </p>
-
-                    <div class="row text-center mt-3">
-
-                        <div class="col-4">
-                            <div class="fs-1">🕳️</div>
-                            <small>Pothole</small>
+            <div class="col-lg-6">
+                <div class="detection-card">
+                    <div class="scan-line"></div>
+                    <div class="detection-card-title">
+                        <i class="fas fa-brain" style="color:var(--neon-orange)"></i>
+                        AI DETECTION SYSTEM
+                    </div>
+                    <div class="damage-type-grid">
+                        <div class="damage-type-item">
+                            <div class="damage-type-icon">🕳️</div>
+                            <div class="damage-type-label">Pothole</div>
                         </div>
-
-                        <div class="col-4">
-                            <div class="fs-1">〰️</div>
-                            <small>Crack</small>
+                        <div class="damage-type-item">
+                            <div class="damage-type-icon">⚡</div>
+                            <div class="damage-type-label">Crack</div>
                         </div>
-
-                        <div class="col-4">
-                            <div class="fs-1">🚧</div>
-                            <small>Damage</small>
+                        <div class="damage-type-item">
+                            <div class="damage-type-icon">🛣️</div>
+                            <div class="damage-type-label">Damage</div>
                         </div>
-
+                        <div class="damage-type-item">
+                            <div class="damage-type-icon">💧</div>
+                            <div class="damage-type-label">Pothole Water</div>
+                        </div>
+                        <div class="damage-type-item">
+                            <div class="damage-type-icon">🔍</div>
+                            <div class="damage-type-label">Surface</div>
+                        </div>
+                        <div class="damage-type-item">
+                            <div class="damage-type-icon">✅</div>
+                            <div class="damage-type-label">No Damage</div>
+                        </div>
                     </div>
 
+                    <div style="margin-top:1.5rem;padding:1rem;background:rgba(0,229,255,0.04);border-radius:8px;border:1px solid rgba(0,229,255,0.1);">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+                            <span style="font-size:0.75rem;color:var(--text-muted);letter-spacing:1px;">DETECTION CONFIDENCE</span>
+                            <span style="font-family:var(--font-heading);font-size:0.9rem;color:var(--neon-green);">HIGH</span>
+                        </div>
+                        <div style="height:4px;background:rgba(0,229,255,0.1);border-radius:2px;overflow:hidden;">
+                            <div style="height:100%;width:87%;background:linear-gradient(90deg,var(--neon-cyan),var(--neon-green));border-radius:2px;"></div>
+                        </div>
+                        <div style="font-size:0.7rem;color:var(--text-muted);margin-top:0.4rem;">YOLO v11 Model — 87% Avg. Confidence</div>
+                    </div>
                 </div>
-
             </div>
 
         </div>
-
     </div>
-
 </section>
 
-
-<section class="py-5 bg-white">
-
+<!-- Features -->
+<section class="features-section">
     <div class="container">
-
         <div class="text-center mb-5">
-
-            <h2 class="fw-bold">
-                System Features
-            </h2>
-
-            <p class="text-muted">
-                Smart technology for better road maintenance
-            </p>
-
+            <div class="section-label">Platform Capabilities</div>
+            <h2 class="section-title">System Features</h2>
+            <p style="color:var(--text-muted);font-size:0.95rem;">Smart technology for better road maintenance and infrastructure</p>
         </div>
-
 
         <div class="row g-4">
-
             <div class="col-md-4">
-
-                <div class="card feature-card shadow-sm p-4 h-100">
-
-                    <h4>🤖 AI Detection</h4>
-
-                    <p class="text-muted">
-                        Detect road damage from uploaded images
-                        using a deep learning model.
-                    </p>
-
+                <div class="feature-card">
+                    <div class="feature-icon" style="background:rgba(0,229,255,0.1);">
+                        <i class="fas fa-robot" style="color:var(--neon-cyan);"></i>
+                    </div>
+                    <div class="feature-title">AI Detection</div>
+                    <p class="feature-desc">Upload road images and let the YOLO deep learning model instantly identify and classify road damage types with confidence scores.</p>
                 </div>
-
             </div>
-
-
             <div class="col-md-4">
-
-                <div class="card feature-card shadow-sm p-4 h-100">
-
-                    <h4>📍 Location Reporting</h4>
-
-                    <p class="text-muted">
-                        Record the location of damaged roads
-                        for easier maintenance.
-                    </p>
-
+                <div class="feature-card">
+                    <div class="feature-icon" style="background:rgba(255,109,0,0.1);">
+                        <i class="fas fa-map-marker-alt" style="color:var(--neon-orange);"></i>
+                    </div>
+                    <div class="feature-title">Location Reporting</div>
+                    <p class="feature-desc">Capture precise GPS coordinates of damaged road sections. View locations on maps and track reported zones geographically.</p>
                 </div>
-
             </div>
-
-
             <div class="col-md-4">
-
-                <div class="card feature-card shadow-sm p-4 h-100">
-
-                    <h4>📊 Analytics</h4>
-
-                    <p class="text-muted">
-                        Analyze reported road damages and
-                        maintenance status.
-                    </p>
-
+                <div class="feature-card">
+                    <div class="feature-icon" style="background:rgba(57,255,20,0.08);">
+                        <i class="fas fa-chart-line" style="color:var(--neon-green);"></i>
+                    </div>
+                    <div class="feature-title">Analytics & Tracking</div>
+                    <p class="feature-desc">Monitor damage statistics, severity breakdowns, repair status, and system-wide trends through an intuitive admin dashboard.</p>
                 </div>
-
             </div>
-
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background:rgba(41,121,255,0.1);">
+                        <i class="fas fa-shield-alt" style="color:#82b1ff;"></i>
+                    </div>
+                    <div class="feature-title">Admin Verification</div>
+                    <p class="feature-desc">Admin panel for reviewing, verifying, and managing all submitted damage reports. Assign repair teams and track completion.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background:rgba(255,23,68,0.08);">
+                        <i class="fas fa-exclamation-triangle" style="color:#ff5252;"></i>
+                    </div>
+                    <div class="feature-title">Severity Assessment</div>
+                    <p class="feature-desc">Automatic severity classification (High / Medium / Low) based on AI confidence scores to prioritize critical road repairs first.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background:rgba(0,229,255,0.06);">
+                        <i class="fas fa-wrench" style="color:var(--neon-cyan);"></i>
+                    </div>
+                    <div class="feature-title">Repair Management</div>
+                    <p class="feature-desc">Assign repair teams, track work progress from assignment through completion, and maintain full audit trail of every repair.</p>
+                </div>
+            </div>
         </div>
-
     </div>
-
 </section>
 
-
-<footer class="bg-dark text-white text-center py-4">
-
-    <p class="mb-0">
-        © 2026 RoadAI - Road Damage Detection System
-    </p>
-
-</footer>
-
-</body>
-</html>
+{% endblock %}
