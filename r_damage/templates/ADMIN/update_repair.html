@@ -1,0 +1,96 @@
+{% extends "base_entity.html" %}
+
+{% block title %}Update Repair{% endblock %}
+{% block role_label %}Admin{% endblock %}
+
+{% block brand_url %}/admin_home{% endblock %}
+{% block brand_name %}RoadAI Admin{% endblock %}
+
+{% block nav_links %}
+<a href="/admin_home"         class="nav-pill nav-pill-ghost"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+<a href="/admin_view_reports" class="nav-pill nav-pill-ghost"><i class="fas fa-file-alt"></i> Reports</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex align-items-center gap-3 mb-4 fade-in">
+    <a href="/admin_view_reports" class="btn-cyber btn-cyber-ghost btn-cyber-sm">
+        <i class="fas fa-arrow-left"></i> Back
+    </a>
+    <div>
+        <div class="page-title"><i class="fas fa-wrench" style="color:var(--neon-cyan);font-size:1.1rem;"></i> Update Repair</div>
+        <div class="page-subtitle">Repair #{{ repair.id }} — Report #{{ repair.damage.id }}</div>
+    </div>
+</div>
+
+<div class="row justify-content-center fade-in">
+    <div class="col-lg-7">
+        <div class="glass-card">
+            <div class="glass-card-header">
+                <i class="fas fa-tools" style="color:var(--neon-cyan)"></i>
+                <h5>Repair Details</h5>
+                <div class="ms-auto">
+                    {% if repair.status == "Completed" %}<span class="badge-cyber badge-completed">Completed</span>
+                    {% elif repair.status == "Under Repair" %}<span class="badge-cyber badge-repair">Under Repair</span>
+                    {% else %}<span class="badge-cyber badge-assigned">Assigned</span>{% endif %}
+                </div>
+            </div>
+            <div class="glass-card-body">
+
+                <!-- Info Row -->
+                <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:1.5rem;padding:1rem;background:rgba(0,229,255,0.04);border:1px solid rgba(0,229,255,0.1);border-radius:8px;">
+                    <div>
+                        <div style="font-size:0.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--neon-cyan);margin-bottom:4px;">Assigned To</div>
+                        <div style="font-weight:600;">{{ repair.assigned_to }}</div>
+                    </div>
+                    <div>
+                        <div style="font-size:0.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--neon-cyan);margin-bottom:4px;">Damage Type</div>
+                        <div>{{ repair.damage.damage_type|default:"N/A"|capfirst }}</div>
+                    </div>
+                    <div>
+                        <div style="font-size:0.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--neon-cyan);margin-bottom:4px;">Assigned Date</div>
+                        <div style="font-size:0.85rem;color:var(--text-muted);">{{ repair.assigned_date|date:"N j, Y" }}</div>
+                    </div>
+                    {% if repair.completed_date %}
+                    <div>
+                        <div style="font-size:0.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--neon-green);margin-bottom:4px;">Completed Date</div>
+                        <div style="font-size:0.85rem;color:var(--neon-green);">{{ repair.completed_date|date:"N j, Y" }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label-futuristic">Update Status</label>
+                        <select name="status" class="form-select-futuristic">
+                            <option value="Assigned"    {% if repair.status == "Assigned" %}selected{% endif %}>Assigned</option>
+                            <option value="Under Repair"{% if repair.status == "Under Repair" %}selected{% endif %}>Under Repair</option>
+                            <option value="Completed"   {% if repair.status == "Completed" %}selected{% endif %}>Completed</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label-futuristic">Repair Notes</label>
+                        <textarea name="repair_description"
+                                  class="form-control-futuristic"
+                                  rows="5"
+                                  placeholder="Update repair progress notes…">{{ repair.repair_description }}</textarea>
+                    </div>
+
+                    <div class="d-flex gap-3">
+                        <a href="/admin_view_reports" class="btn-cyber btn-cyber-ghost">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn-cyber btn-cyber-primary">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
